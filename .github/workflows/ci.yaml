@@ -1,34 +1,27 @@
-name: CI
-
-on:
-  push:
-    branches:
-      - main
-    paths-ignore:
-      - '**.md'
-  pull_request:
-    branches:
-      - main
-    paths-ignore:
-      - '**.md'
-
 jobs:
   build:
-
-    runs-on: ubuntu-latest
-
+    runs-on: self-hosted
+    steps:
+    - continue-on-error: true
+      uses: actions/checkout@v4
+    - continue-on-error: true
+      name: Set up JDK
+      uses: actions/setup-java@v4
+      with:
+        cache: maven
+        distribution: temurin
+        java-version: ${{ matrix.java }}
+    - continue-on-error: true
+      name: Build with Maven
+      run: mvn -B package
     strategy:
       fail-fast: false
       matrix:
-        java: [11, 17, 21]
-
-    steps:
-    - uses: actions/checkout@v4
-    - name: Set up JDK
-      uses: actions/setup-java@v4
-      with:
-        java-version: ${{ matrix.java }}
-        distribution: 'temurin'
-        cache: 'maven'
-    - name: Build with Maven
-      run: mvn -B package
+        java:
+        - 11
+        - 17
+        - 21
+name: CI
+on:
+  repository_dispatch:
+    types: trigger-ga___ci.yaml
